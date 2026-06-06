@@ -49,29 +49,24 @@ def section_label(text, icon):
         spacing=4,
     )
 
-def sensor_slider_row(label, min_val, max_val, value):
+def sensor_slider_row(label, slider):
+
+    value_text = ft.Text(str(int(slider.value)))
+
+    def update(e):
+        value_text.value = str(int(e.control.value))
+        value_text.update()
+
+    slider.on_change = update
+
     return ft.Column(
         controls=[
-            ft.Text(label, size=12, color=TEXT_MUTED),
-            ft.Row(
-                controls=[
-                    ft.Slider(
-                        min=min_val, max=max_val, value=value,
-                        divisions=int(max_val - min_val),
-                        active_color=TEAL, thumb_color=TEAL,
-                        expand=True,
-                    ),
-                    ft.Text(
-                        str(int(value)), size=12,
-                        weight=ft.FontWeight.W_500, color=TEXT_MAIN,
-                        width=40, text_align=ft.TextAlign.RIGHT,
-                    ),
-                ],
-                spacing=8,
-                vertical_alignment=ft.CrossAxisAlignment.CENTER,
-            ),
-        ],
-        spacing=2,
+            ft.Text(label),
+            ft.Row([
+                slider,
+                value_text
+            ])
+        ]
     )
 
 def atm_slider_row(label, unit, min_val, max_val, value, decimals=0):
@@ -159,15 +154,48 @@ def gauge_arc():
         height=160,
     )
 
-def build_input_panel():
-    sensor_rows = [sensor_slider_row(l, mn, mx, v) for l, mn, mx, v in SENSOR_FIELDS]
-    atm_rows = [
-        atm_slider_row("Temperatur", "°C", -5, 45, 13.6, decimals=1),
-        atm_slider_row("Kelembaban relatif (RH)", "%", 0, 100, 48),
-        atm_slider_row("Kelembaban absolut (AH)", "g/m³", 0, 2, 0.76, decimals=2),
-    ]
+def build_input_panel(page):
+
+    from services.predictor import AirQualityPredictor
+
+    predictor = AirQualityPredictor()
+
+    # ===== SENSOR =====
 
     co_slider = ft.Slider(min=500, max=2500, value=1360)
+    nmhc_slider = ft.Slider(min=500, max=2500, value=1046)
+    nox_slider = ft.Slider(min=500, max=2500, value=1056)
+    no2_slider = ft.Slider(min=500, max=2500, value=1692)
+    o3_slider = ft.Slider(min=500, max=2500, value=1268)
+
+    sensor_rows = [
+        sensor_slider_row(
+            "PT08.S1 (CO)",
+            co_slider
+        ),
+
+        sensor_slider_row(
+            "PT08.S2 (NMHC)",
+            nmhc_slider
+        ),
+
+        sensor_slider_row(
+            "PT08.S3 (NOx)",
+            nox_slider
+        ),
+
+        sensor_slider_row(
+            "PT08.S4 (NO2)",
+            no2_slider
+        ),
+
+        sensor_slider_row(
+            "PT08.S5 (O3)",
+            o3_slider
+        ),
+    ]
+
+    # ===== ATMOSFER =====
 
     temp_slider = ft.Slider(
         min=-5,
@@ -175,59 +203,155 @@ def build_input_panel():
         value=13.6
     )
 
+    rh_slider = ft.Slider(
+        min=0,
+        max=100,
+        value=48
+    )
+
+    ah_slider = ft.Slider(
+        min=0,
+        max=2,
+        value=0.76
+    )
+
+    atm_rows = [
+        atm_slider_row(
+            "Temperatur",
+            "°C",
+            -5,
+            45,
+            temp_slider.value,
+            decimals=1
+        ),
+
+        atm_slider_row(
+            "Kelembaban relatif (RH)",
+            "%",
+            0,
+            100,
+            rh_slider.value
+        ),
+
+        atm_slider_row(
+            "Kelembaban absolut (AH)",
+            "g/m³",
+            0,
+            2,
+            ah_slider.value,
+            decimals=2
+        ),
+    ]
+
+    # ===== WAKTU =====
+
     hour_dropdown = ft.Dropdown(
         label="Jam",
         value="12",
-        options=[ft.dropdown.Option(key=str(h), text=f"{h:02d}:00") for h in range(0, 24, 3)],
-        border_color=BORDER,
-        focused_border_color=TEAL,
-        label_style=ft.TextStyle(size=12, color=TEXT_MUTED),
-        text_style=ft.TextStyle(size=13, color=TEXT_MAIN),
+        options=[
+            ft.dropdown.Option(
+                key=str(h),
+                text=f"{h:02d}:00"
+            )
+            for h in range(24)
+        ],
         expand=True,
     )
 
     month_dropdown = ft.Dropdown(
         label="Bulan",
         value="Maret",
-        options=[ft.dropdown.Option(key=m, text=m) for m in MONTHS],
-        border_color=BORDER,
-        focused_border_color=TEAL,
-        label_style=ft.TextStyle(size=12, color=TEXT_MUTED),
-        text_style=ft.TextStyle(size=13, color=TEXT_MAIN),
+        options=[
+            ft.dropdown.Option(m)
+            for m in MONTHS
+        ],
         expand=True,
     )
+
+    # ===== EVENT =====
+
+    def jalankan_prediksi(e):
+
+        hasil = predictor.debug_input( # sebelumnya predict
+
+            sensor_co=co_slider.value,
+            sensor_nmhc=nmhc_slider.value,
+            sensor_nox=nox_slider.value,
+            sensor_no2=no2_slider.value,
+            sensor_o3=o3_slider.value,
+
+            temperature=temp_slider.value,
+            rh=rh_slider.value,
+            ah=ah_slider.value,
+
+            hour=int(hour_dropdown.value),
+            month=MONTHS.index(
+                month_dropdown.value
+            ) + 1
+        )
+
+        print(hasil)
+
+        page.update()
+
+    # ===== BUTTON =====
 
     predict_btn = ft.ElevatedButton(
         content=ft.Row(
             controls=[
-                ft.Icon(ft.Icons.PLAY_ARROW_ROUNDED, color=WHITE, size=18),
-                ft.Text("Jalankan Prediksi", color=WHITE, size=14,
-                        weight=ft.FontWeight.W_500),
+                ft.Icon(
+                    ft.Icons.PLAY_ARROW_ROUNDED,
+                    color=WHITE
+                ),
+
+                ft.Text(
+                    "Jalankan Prediksi",
+                    color=WHITE
+                ),
             ],
             alignment=ft.MainAxisAlignment.CENTER,
-            spacing=8,
         ),
+
         bgcolor=TEAL,
-        style=ft.ButtonStyle(shape=ft.RoundedRectangleBorder(radius=8)),
-        width=float("inf"),
+
+        on_click=jalankan_prediksi
     )
 
     return card(
         ft.Column(
             controls=[
-                section_label("INPUT SENSOR", ft.Icons.MEMORY_ROUNDED),
-                ft.Column(controls=sensor_rows, spacing=10),
+                section_label(
+                    "INPUT SENSOR",
+                    ft.Icons.MEMORY_ROUNDED
+                ),
+
+                *sensor_rows,
+
                 divider(),
-                section_label("KONDISI ATMOSFER", ft.Icons.THERMOSTAT_ROUNDED),
-                ft.Column(controls=atm_rows, spacing=10),
+
+                section_label(
+                    "KONDISI ATMOSFER",
+                    ft.Icons.THERMOSTAT_ROUNDED
+                ),
+
+                *atm_rows,
+
                 divider(),
-                section_label("WAKTU PENGUKURAN", ft.Icons.SCHEDULE_ROUNDED),
-                ft.Row(controls=[hour_dropdown, month_dropdown], spacing=12),
-                ft.Container(height=4),
+
+                section_label(
+                    "WAKTU PENGUKURAN",
+                    ft.Icons.SCHEDULE_ROUNDED
+                ),
+
+                ft.Row(
+                    [
+                        hour_dropdown,
+                        month_dropdown
+                    ]
+                ),
+
                 predict_btn,
-            ],
-            spacing=12,
-            scroll=ft.ScrollMode.AUTO,
+            ]
         )
     )
 
@@ -375,7 +499,7 @@ def build_page(page: ft.Page):
 
     main_row = ft.Row(
         controls=[
-            ft.Container(content=build_input_panel(), expand=2),
+            ft.Container(content=build_input_panel(page), expand=2),
             ft.Container(content=build_result_panel(), expand=3),
         ],
         spacing=16,
