@@ -188,8 +188,7 @@ def build_input_panel(page):
 
     predictor = AirQualityPredictor()
 
-    # ===== SENSOR =====
-
+    # SENSOR 
     co_slider = ft.Slider(min=500, max=2500, value=1360)
     nmhc_slider = ft.Slider(min=500, max=2500, value=1046)
     nox_slider = ft.Slider(min=500, max=2500, value=1056)
@@ -223,8 +222,7 @@ def build_input_panel(page):
         ),
     ]
 
-    # ===== ATMOSFER =====
-
+    # ATMOSFER
     temp_slider = ft.Slider(
         min=-5,
         max=45,
@@ -271,7 +269,7 @@ def build_input_panel(page):
         ),
     ]
 
-    # ===== WAKTU =====
+    # WAKTU
 
     hour_dropdown = ft.Dropdown(
         label="Jam",
@@ -295,8 +293,7 @@ def build_input_panel(page):
         expand=True,
     )
 
-    # ===== EVENT =====
-
+    # Method
     def jalankan_prediksi(e):
 
         hasil = predictor.debug_input( # sebelumnya predict
@@ -321,8 +318,7 @@ def build_input_panel(page):
 
         page.update()
 
-    # ===== BUTTON =====
-
+    # BUTTON
     predict_btn = ft.ElevatedButton(
         content=ft.Row(
             controls=[
