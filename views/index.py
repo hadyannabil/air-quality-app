@@ -51,22 +51,50 @@ def section_label(text, icon):
 
 def sensor_slider_row(label, slider):
 
-    value_text = ft.Text(str(int(slider.value)))
+    value_text = ft.Text(
+        str(int(slider.value)),
+        size=12,
+        weight=ft.FontWeight.W_500,
+        color=TEXT_MAIN,
+        width=40,
+        text_align=ft.TextAlign.RIGHT,
+    )
+
+    slider.active_color = TEAL
+    slider.thumb_color = TEAL
+    slider.expand = True
+
+    if slider.divisions is None:
+        slider.divisions = int(
+            slider.max - slider.min
+        )
 
     def update(e):
-        value_text.value = str(int(e.control.value))
+        value_text.value = str(
+            int(e.control.value)
+        )
         value_text.update()
 
     slider.on_change = update
 
     return ft.Column(
         controls=[
-            ft.Text(label),
-            ft.Row([
-                slider,
-                value_text
-            ])
-        ]
+            ft.Text(
+                label,
+                size=12,
+                color=TEXT_MUTED
+            ),
+
+            ft.Row(
+                controls=[
+                    slider,
+                    value_text
+                ],
+                spacing=8,
+                vertical_alignment=ft.CrossAxisAlignment.CENTER,
+            ),
+        ],
+        spacing=2,
     )
 
 def atm_slider_row(label, unit, min_val, max_val, value, decimals=0):
@@ -248,23 +276,22 @@ def build_input_panel(page):
     hour_dropdown = ft.Dropdown(
         label="Jam",
         value="12",
-        options=[
-            ft.dropdown.Option(
-                key=str(h),
-                text=f"{h:02d}:00"
-            )
-            for h in range(24)
-        ],
+        options=[ft.dropdown.Option(key=str(h), text=f"{h:02d}:00") for h in range(0, 24, 3)],
+        border_color=BORDER,
+        focused_border_color=TEAL,
+        label_style=ft.TextStyle(size=12, color=TEXT_MUTED),
+        text_style=ft.TextStyle(size=13, color=TEXT_MAIN),
         expand=True,
     )
 
     month_dropdown = ft.Dropdown(
         label="Bulan",
         value="Maret",
-        options=[
-            ft.dropdown.Option(m)
-            for m in MONTHS
-        ],
+        options=[ft.dropdown.Option(key=m, text=m) for m in MONTHS],
+        border_color=BORDER,
+        focused_border_color=TEAL,
+        label_style=ft.TextStyle(size=12, color=TEXT_MUTED),
+        text_style=ft.TextStyle(size=13, color=TEXT_MAIN),
         expand=True,
     )
 
