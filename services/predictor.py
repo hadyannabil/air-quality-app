@@ -1,48 +1,52 @@
-import joblib # perlu pip install joblib
+import joblib
+import numpy as np
+import os
 
 class AirQualityPredictor:
 
-    def debug_input(self, sensor_co, sensor_nmhc, sensor_nox, sensor_no2, sensor_o3, temperature, rh, ah, hour, month):
+    def __init__(self):
+        model_path = os.path.join(
+            os.path.dirname(__file__), "..", "models", "model.pkl"
+        )
+        self.model = joblib.load(model_path)
 
-        print("\n===== INPUT DITERIMA =====")
+    def predict(
+        self,
+        sensor_co,      # PT08.S1(CO)
+        nmhc_gt,        # NMHC(GT)
+        c6h6_gt,        # C6H6(GT)
+        sensor_nmhc,    # PT08.S2(NMHC)
+        nox_gt,         # NOx(GT)
+        sensor_nox,     # PT08.S3(NOx)
+        no2_gt,         # NO2(GT)
+        sensor_no2,     # PT08.S4(NO2)
+        sensor_o3,      # PT08.S5(O3)
+        temperature,    # T
+        rh,             # RH
+        ah,             # AH
+        month,          # Month
+        hour,           # Hour
+    ):
+        # Urutan fitur harus sesuai dengan training:
+        # ['PT08.S1(CO)', 'NMHC(GT)', 'C6H6(GT)', 'PT08.S2(NMHC)',
+        #  'NOx(GT)', 'PT08.S3(NOx)', 'NO2(GT)', 'PT08.S4(NO2)',
+        #  'PT08.S5(O3)', 'T', 'RH', 'AH', 'Month', 'Hour']
+        data = np.array([[
+            sensor_co,
+            nmhc_gt,
+            c6h6_gt,
+            sensor_nmhc,
+            nox_gt,
+            sensor_nox,
+            no2_gt,
+            sensor_no2,
+            sensor_o3,
+            temperature,
+            rh,
+            ah,
+            month,
+            hour,
+        ]])
 
-        print("Sensor CO      :", sensor_co)
-        print("Sensor NMHC    :", sensor_nmhc)
-        print("Sensor NOx     :", sensor_nox)
-        print("Sensor NO2     :", sensor_no2)
-        print("Sensor O3      :", sensor_o3)
-
-        print("Temperatur     :", temperature)
-        print("RH             :", rh)
-        print("AH             :", ah)
-
-        print("Jam            :", hour)
-        print("Bulan          :", month)
-
-        print("==========================\n")
-
-        return "VALID"
-    
-    # def __init__(self):
-    #     self.model = joblib.load(
-    #         "models/model.pkl"
-    #     )
-
-    # def predict(self, sensor_co, sensor_nmhc, sensor_nox, sensor_no2, sensor_o3, temperature, rh, ah, hour, month):
-
-    #     data = [[
-    #         sensor_co,
-    #         sensor_nmhc,
-    #         sensor_nox,
-    #         sensor_no2,
-    #         sensor_o3,
-    #         temperature,
-    #         rh,
-    #         ah,
-    #         hour,
-    #         month
-    #     ]]
-
-    #     hasil = self.model.predict(data)
-
-    #     return hasil
+        hasil = self.model.predict(data)
+        return float(hasil[0])
