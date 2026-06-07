@@ -317,9 +317,10 @@ def build_result_panel(co_val=None):
     )
 
 def build_trend_section():
-    hourly = [5.2,4.8,4.5,4.3,4.6,5.8,8.2,11.4,12.8,11.6,
-              10.2,9.4,8.9,9.1,9.8,10.6,11.2,10.8,9.6,8.4,
-              7.6,6.8,6.2,5.6]
+    # Rata-rata CO(GT) per jam dari dataset AirQualityUCI
+    hourly = [1.79, 1.47, 1.10, 0.89, 0.76, 0.71, 0.92, 1.81,
+              2.82, 2.97, 2.57, 2.26, 2.17, 2.20, 2.13, 2.05,
+              2.27, 2.82, 3.44, 3.73, 3.47, 2.60, 1.98, 1.88]
     max_val = max(hourly)
 
     bars = []
@@ -348,7 +349,7 @@ def build_trend_section():
     return card(
         ft.Column(
             controls=[
-                section_label("TREN POLUSI HARIAN — RATA-RATA PER JAM (ILUSTRASI)", ft.Icons.SHOW_CHART_ROUNDED),
+                section_label("TREN POLUSI HARIAN — RATA-RATA CO PER JAM (AirQualityUCI)", ft.Icons.SHOW_CHART_ROUNDED),
                 ft.Container(height=4),
                 ft.Container(
                     content=ft.Row(controls=bars, spacing=3, vertical_alignment=ft.CrossAxisAlignment.END),
@@ -417,7 +418,7 @@ def build_page(page: ft.Page):
                 build_trend_section(),
                 ft.Container(height=12),
                 ft.Text(
-                    "UAP Machine Learning  ·  Teknik Informatika  ·  Universitas Brawijaya",
+                    "Kecerdasan Artifisial Lanjut  ·  Teknik Informatika  ·  Universitas Brawijaya",
                     size=11, color=TEXT_MUTED, text_align=ft.TextAlign.CENTER,
                 ),
             ],
