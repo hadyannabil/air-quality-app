@@ -9,4 +9,4 @@ def main(page: ft.Page):
     build_page(page)
 
 
-ft.app(target=main)
+ft.run(main)

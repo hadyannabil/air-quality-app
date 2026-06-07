@@ -85,33 +85,66 @@ def get_status_co(value):
     return "🔴 Berbahaya",      RED_LIGHT,   "#991B1B"
 
 def gauge_ring(value, max_val=12.0):
+    size = 150
     ratio = min(max(value / max_val, 0.0), 1.0)
     _, _, fg = get_status_co(value)
 
-    return ft.Stack(
-        controls=[
-            ft.Container(
-                content=ft.ProgressRing(value=1.0, width=150, height=150, stroke_width=16, color=BORDER),
-                alignment=ft.Alignment(0, 0),
-            ),
-            ft.Container(
-                content=ft.ProgressRing(value=ratio, width=150, height=150, stroke_width=16, color=fg),
-                alignment=ft.Alignment(0, 0),
-            ),
-            ft.Container(
-                content=ft.Column(
-                    controls=[
-                        ft.Text(f"{value:.2f}", size=30, weight=ft.FontWeight.W_600,
-                                color=TEXT_MAIN, text_align=ft.TextAlign.CENTER),
-                        ft.Text("mg/m³", size=11, color=TEXT_MUTED, text_align=ft.TextAlign.CENTER),
-                    ],
-                    horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-                    spacing=2,
+    return ft.Container(
+        width=size,
+        height=size,
+
+        content=ft.Stack(
+            width=size,
+            height=size,
+
+            controls=[
+
+                ft.ProgressRing(
+                    value=1,
+                    width=size,
+                    height=size,
+                    stroke_width=16,
+                    color=BORDER,
                 ),
-                alignment=ft.Alignment(0, 0),
-            ),
-        ],
-        width=170, height=170,
+
+                ft.ProgressRing(
+                    value=ratio,
+                    width=size,
+                    height=size,
+                    stroke_width=16,
+                    color=fg,
+                ),
+
+                ft.Container(
+                    width=size,
+                    height=size,
+                    alignment=ft.Alignment.CENTER,
+
+                    content=ft.Column(
+                        controls=[
+                            ft.Text(
+                                f"{value:.2f}",
+                                size=30,
+                                weight=ft.FontWeight.W_600,
+                                color=TEXT_MAIN,
+                                text_align=ft.TextAlign.CENTER,
+                            ),
+                            ft.Text(
+                                "mg/m³",
+                                size=11,
+                                color=TEXT_MUTED,
+                                text_align=ft.TextAlign.CENTER,
+                            ),
+
+                        ],
+
+                        spacing=-2,
+                        alignment=ft.MainAxisAlignment.CENTER,
+                        horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                    )
+                ),
+            ]
+        )
     )
 
 def build_input_panel(page, on_predict):
@@ -315,7 +348,6 @@ def build_result_panel(co_val=None):
     )
 
 def build_trend_section():
-    # Rata-rata CO(GT) per jam dari dataset AirQualityUCI
     hourly = [1.79, 1.47, 1.10, 0.89, 0.76, 0.71, 0.92, 1.81,
               2.82, 2.97, 2.57, 2.26, 2.17, 2.20, 2.13, 2.05,
               2.27, 2.82, 3.44, 3.73, 3.47, 2.60, 1.98, 1.88]
