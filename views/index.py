@@ -296,8 +296,7 @@ def build_input_panel(page):
     # Method
     def jalankan_prediksi(e):
 
-        hasil = predictor.debug_input( # sebelumnya predict
-
+        hasil = predictor.debug_input( # sebelumnya kalau mau cek logika input pake .debug_input, kalau prediksi pakai .predict
             sensor_co=co_slider.value,
             sensor_nmhc=nmhc_slider.value,
             sensor_nox=nox_slider.value,

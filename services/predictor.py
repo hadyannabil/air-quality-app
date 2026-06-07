@@ -1,18 +1,8 @@
+import joblib # perlu pip install joblib
+
 class AirQualityPredictor:
 
-    def debug_input(
-        self,
-        sensor_co,
-        sensor_nmhc,
-        sensor_nox,
-        sensor_no2,
-        sensor_o3,
-        temperature,
-        rh,
-        ah,
-        hour,
-        month
-    ):
+    def debug_input(self, sensor_co, sensor_nmhc, sensor_nox, sensor_no2, sensor_o3, temperature, rh, ah, hour, month):
 
         print("\n===== INPUT DITERIMA =====")
 
@@ -32,3 +22,27 @@ class AirQualityPredictor:
         print("==========================\n")
 
         return "VALID"
+    
+    # def __init__(self):
+    #     self.model = joblib.load(
+    #         "models/model.pkl"
+    #     )
+
+    # def predict(self, sensor_co, sensor_nmhc, sensor_nox, sensor_no2, sensor_o3, temperature, rh, ah, hour, month):
+
+    #     data = [[
+    #         sensor_co,
+    #         sensor_nmhc,
+    #         sensor_nox,
+    #         sensor_no2,
+    #         sensor_o3,
+    #         temperature,
+    #         rh,
+    #         ah,
+    #         hour,
+    #         month
+    #     ]]
+
+    #     hasil = self.model.predict(data)
+
+    #     return hasil
