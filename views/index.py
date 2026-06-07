@@ -296,8 +296,7 @@ def build_input_panel(page):
     # Method
     def jalankan_prediksi(e):
 
-        hasil = predictor.debug_input( # sebelumnya predict
-
+        hasil = predictor.debug_input( # sebelumnya kalau mau cek logika input pake .debug_input, kalau prediksi pakai .predict
             sensor_co=co_slider.value,
             sensor_nmhc=nmhc_slider.value,
             sensor_nox=nox_slider.value,
@@ -378,63 +377,135 @@ def build_input_panel(page):
         )
     )
 
-def build_result_panel():
+def build_result_panel(hasil_prediksi=None):
+    if hasil_prediksi is None:
+        hasil_prediksi = {
+            "co": 0,
+            "nmhc": 0,
+            "c6h6": 0,
+            "nox": 0,
+            "no2": 0,
+        }
+
+    def get_status(value): #sementara
+        if value < 5:
+            return "🟢 Rendah", "#DCFCE7", "#166534"
+        elif value < 10:
+            return "🟡 Sedang", "#FAEEDA", "#633806"
+        return "🔴 Tinggi", "#FEE2E2", "#991B1B"
+
+    def metric_box(label, value):
+        status, bg, fg = get_status(value)
+
+        return ft.Container(
+            expand=True,
+            bgcolor=GRAY_BG,
+            border_radius=12,
+            padding=14,
+            content=ft.Column(
+                controls=[
+                    ft.Text(
+                        label,
+                        size=12,
+                        color=TEXT_MUTED
+                    ),
+                    ft.Text(
+                        f"{value:.2f}",
+                        size=26,
+                        weight=ft.FontWeight.W_600,
+                        color=TEXT_MAIN,
+                    ),
+                    ft.Text(
+                        "µg/m³",
+                        size=11,
+                        color=TEXT_MUTED
+                    ),
+                    status_badge(
+                        status,
+                        bg,
+                        fg
+                    ),
+                ],
+                horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                spacing=8
+            )
+        )
+
     result_card = card(
         ft.Column(
             controls=[
-                section_label("HASIL PREDIKSI — BENZENA (C6H6)", ft.Icons.TRACK_CHANGES_ROUNDED),
-                ft.Container(height=8),
-                ft.Column(
-                    controls=[
-                        gauge_arc(),
-                        ft.Text("C6H6 — Benzena", size=12, color=TEXT_MUTED),
-                        status_badge("⚠  Sedang", AMBER_LIGHT, "#633806"),
-                    ],
-                    horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-                    spacing=8,
+                section_label(
+                    "HASIL PREDIKSI",
+                    ft.Icons.TRACK_CHANGES_ROUNDED
                 ),
-                ft.Container(height=4),
-                divider(),
-                ft.Container(height=8),
-                ft.Text("Interpretasi", size=12, color=TEXT_MUTED),
-                ft.Text(
-                    "Konsentrasi Benzena berada di level sedang. "
-                    "Disarankan membatasi aktivitas di luar ruangan.",
-                    size=13, color=TEXT_MAIN,
-                ),
-            ],
-            spacing=8,
-        )
-    )
-
-    metrics_card = card(
-        ft.Column(
-            controls=[
-                section_label("EVALUASI MODEL", ft.Icons.ANALYTICS_ROUNDED),
                 ft.Container(height=8),
                 ft.Row(
                     controls=[
-                        metric_card("MAE", "0.82"),
-                        metric_card("RMSE", "1.14"),
-                        metric_card("R²", "0.91"),
+                        metric_box(
+                            "CO",
+                            hasil_prediksi["co"]
+                        ),
+                        metric_box(
+                            "NMHC",
+                            hasil_prediksi["nmhc"]
+                        ),
+                        metric_box(
+                            "C6H6",
+                            hasil_prediksi["c6h6"]
+                        ),
                     ],
-                    spacing=8,
+                    spacing=12
                 ),
-                ft.Container(height=4),
-                ft.Text(
-                    "Algoritma: Linear Regression  ·  Dataset: UCI Air Quality 2004–2005",
-                    size=11, color=TEXT_MUTED,
-                ),
+
+                ft.Row(
+                    controls=[
+                        metric_box(
+                            "NOx",
+                            hasil_prediksi["nox"]
+                        ),
+                        metric_box(
+                            "NO2",
+                            hasil_prediksi["no2"]
+                        ),
+                    ],
+                    spacing=12
+                )
             ],
-            spacing=8,
+
+            spacing=12
         )
     )
 
-    return ft.Column(
-        controls=[result_card, metrics_card],
-        spacing=12,
-        expand=True,
-    )
+    return result_card
+
+    # metrics_card = card(
+    #     ft.Column(
+    #         controls=[
+    #             section_label("EVALUASI MODEL", ft.Icons.ANALYTICS_ROUNDED),
+    #             ft.Container(height=8),
+    #             ft.Row(
+    #                 controls=[
+    #                     metric_card("MAE", "0.82"),
+    #                     metric_card("RMSE", "1.14"),
+    #                     metric_card("R²", "0.91"),
+    #                 ],
+    #                 spacing=8,
+    #             ),
+    #             ft.Container(height=4),
+    #             ft.Text(
+    #                 "Algoritma: Linear Regression  ·  Dataset: UCI Air Quality 2004–2005",
+    #                 size=11, color=TEXT_MUTED,
+    #             ),
+    #         ],
+    #         spacing=8,
+    #     )
+    # )
+
+    # return ft.Column(
+    #     controls=[result_card, metrics_card],
+    #     spacing=12,
+    #     expand=True,
+    # )
 
 def build_trend_section():
     hourly = [5.2,4.8,4.5,4.3,4.6,5.8,8.2,11.4,12.8,11.6,
