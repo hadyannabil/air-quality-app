@@ -3,3 +3,5 @@ __pycache__/
 *.pyc
 *.pyo
 *.pyd
+/services/__pycache__
+/views/__pycache__
