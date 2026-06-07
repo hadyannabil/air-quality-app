@@ -5,3 +5,5 @@ __pycache__/
 *.pyd
 /services/__pycache__
 /views/__pycache__
+views/__pycache__/index.cpython-314.pyc
+services\__pycache__\predictor.cpython-314.pyc
