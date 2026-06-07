@@ -378,162 +378,105 @@ def build_input_panel(page):
     )
 
 def build_result_panel(hasil_prediksi=None):
-
     if hasil_prediksi is None:
         hasil_prediksi = {
             "co": 0,
             "nmhc": 0,
             "c6h6": 0,
             "nox": 0,
-            "no2": 0
+            "no2": 0,
         }
 
     def get_status(value):
         if value < 5:
-            return (
-                "🟢 Rendah",
-                "#DCFCE7",
-                "#166534"
-            )
+            return "🟢 Rendah", "#DCFCE7", "#166534"
         elif value < 10:
-            return (
-                "🟡 Sedang",
-                "#FAEEDA",
-                "#633806"
-            )
-        return (
-            "🔴 Tinggi",
-            "#FEE2E2",
-            "#991B1B"
-        )
+            return "🟡 Sedang", "#FAEEDA", "#633806"
+        return "🔴 Tinggi", "#FEE2E2", "#991B1B"
 
-    def gauge_card(label, value):
-        ratio = min(max(value / 20, 0), 1)
-
+    def metric_box(label, value):
         status, bg, fg = get_status(value)
 
-        return card(
-            ft.Column(
+        return ft.Container(
+            expand=True,
+            bgcolor=GRAY_BG,
+            border_radius=12,
+            padding=14,
+            content=ft.Column(
                 controls=[
-                    ft.Stack(
-                        controls=[
-                            ft.ProgressRing(
-                                value=1,
-                                width=140,
-                                height=140,
-                                stroke_width=14,
-                                color=BORDER,
-                            ),
-
-                            ft.ProgressRing(
-                                value=ratio,
-                                width=140,
-                                height=140,
-                                stroke_width=14,
-                                color=TEAL,
-                            ),
-
-                            ft.Container(
-                                content=ft.Column(
-                                    controls=[
-                                        ft.Text(
-                                            f"{value:.1f}",
-                                            size=24,
-                                            weight=ft.FontWeight.W_600,
-                                            color=TEXT_MAIN,
-                                            text_align=ft.TextAlign.CENTER
-                                        ),
-
-                                        ft.Text(
-                                            "µg/m³",
-                                            size=11,
-                                            color=TEXT_MUTED,
-                                            text_align=ft.TextAlign.CENTER
-                                        ),
-                                    ],
-
-                                    alignment=ft.MainAxisAlignment.CENTER,
-                                    horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-                                    spacing=2,
-                                ),
-
-                                alignment=ft.Alignment.CENTER,
-
-                                width=140,
-                                height=140
-                            )
-                        ],
-
-                        width=140,
-                        height=140
-                    ),
-
                     ft.Text(
                         label,
                         size=12,
                         color=TEXT_MUTED
                     ),
-
+                    ft.Text(
+                        f"{value:.2f}",
+                        size=26,
+                        weight=ft.FontWeight.W_600,
+                        color=TEXT_MAIN,
+                    ),
+                    ft.Text(
+                        "µg/m³",
+                        size=11,
+                        color=TEXT_MUTED
+                    ),
                     status_badge(
                         status,
                         bg,
                         fg
-                    )
+                    ),
                 ],
-
                 horizontal_alignment=ft.CrossAxisAlignment.CENTER,
                 spacing=8
             )
         )
 
-    return ft.Column(
-        controls=[
-            section_label(
-                "HASIL PREDIKSI",
-                ft.Icons.TRACK_CHANGES_ROUNDED
-            ),
-            ft.Row(
-                controls=[
-                    gauge_card(
-                        "CO",
-                        hasil_prediksi["co"]
-                    ),
+    result_card = card(
+        ft.Column(
+            controls=[
+                section_label(
+                    "HASIL PREDIKSI",
+                    ft.Icons.TRACK_CHANGES_ROUNDED
+                ),
+                ft.Container(height=8),
+                ft.Row(
+                    controls=[
+                        metric_box(
+                            "CO",
+                            hasil_prediksi["co"]
+                        ),
+                        metric_box(
+                            "NMHC",
+                            hasil_prediksi["nmhc"]
+                        ),
+                        metric_box(
+                            "C6H6",
+                            hasil_prediksi["c6h6"]
+                        ),
+                    ],
+                    spacing=12
+                ),
 
-                    gauge_card(
-                        "NMHC",
-                        hasil_prediksi["nmhc"]
-                    ),
+                ft.Row(
+                    controls=[
+                        metric_box(
+                            "NOx",
+                            hasil_prediksi["nox"]
+                        ),
+                        metric_box(
+                            "NO2",
+                            hasil_prediksi["no2"]
+                        ),
+                    ],
+                    spacing=12
+                )
+            ],
 
-                    gauge_card(
-                        "C6H6",
-                        hasil_prediksi["c6h6"]
-                    ),
-                ],
-
-                spacing=12,
-                wrap=True
-            ),
-
-            ft.Row(
-                controls=[
-                    gauge_card(
-                        "NOx",
-                        hasil_prediksi["nox"]
-                    ),
-
-                    gauge_card(
-                        "NO2",
-                        hasil_prediksi["no2"]
-                    ),
-                ],
-
-                spacing=12,
-                wrap=True
-            )
-        ],
-
-        spacing=16
+            spacing=12
+        )
     )
+
+    return result_card
 
     # metrics_card = card(
     #     ft.Column(
