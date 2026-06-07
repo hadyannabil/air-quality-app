@@ -387,7 +387,7 @@ def build_result_panel(hasil_prediksi=None):
             "no2": 0,
         }
 
-    def get_status(value):
+    def get_status(value): #sementara
         if value < 5:
             return "🟢 Rendah", "#DCFCE7", "#166534"
         elif value < 10:
