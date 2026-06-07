@@ -377,63 +377,192 @@ def build_input_panel(page):
         )
     )
 
-def build_result_panel():
-    result_card = card(
-        ft.Column(
-            controls=[
-                section_label("HASIL PREDIKSI — BENZENA (C6H6)", ft.Icons.TRACK_CHANGES_ROUNDED),
-                ft.Container(height=8),
-                ft.Column(
-                    controls=[
-                        gauge_arc(),
-                        ft.Text("C6H6 — Benzena", size=12, color=TEXT_MUTED),
-                        status_badge("⚠  Sedang", AMBER_LIGHT, "#633806"),
-                    ],
-                    horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-                    spacing=8,
-                ),
-                ft.Container(height=4),
-                divider(),
-                ft.Container(height=8),
-                ft.Text("Interpretasi", size=12, color=TEXT_MUTED),
-                ft.Text(
-                    "Konsentrasi Benzena berada di level sedang. "
-                    "Disarankan membatasi aktivitas di luar ruangan.",
-                    size=13, color=TEXT_MAIN,
-                ),
-            ],
-            spacing=8,
-        )
-    )
+def build_result_panel(hasil_prediksi=None):
 
-    metrics_card = card(
-        ft.Column(
-            controls=[
-                section_label("EVALUASI MODEL", ft.Icons.ANALYTICS_ROUNDED),
-                ft.Container(height=8),
-                ft.Row(
-                    controls=[
-                        metric_card("MAE", "0.82"),
-                        metric_card("RMSE", "1.14"),
-                        metric_card("R²", "0.91"),
-                    ],
-                    spacing=8,
-                ),
-                ft.Container(height=4),
-                ft.Text(
-                    "Algoritma: Linear Regression  ·  Dataset: UCI Air Quality 2004–2005",
-                    size=11, color=TEXT_MUTED,
-                ),
-            ],
-            spacing=8,
+    if hasil_prediksi is None:
+        hasil_prediksi = {
+            "co": 0,
+            "nmhc": 0,
+            "c6h6": 0,
+            "nox": 0,
+            "no2": 0
+        }
+
+    def get_status(value):
+        if value < 5:
+            return (
+                "🟢 Rendah",
+                "#DCFCE7",
+                "#166534"
+            )
+        elif value < 10:
+            return (
+                "🟡 Sedang",
+                "#FAEEDA",
+                "#633806"
+            )
+        return (
+            "🔴 Tinggi",
+            "#FEE2E2",
+            "#991B1B"
         )
-    )
+
+    def gauge_card(label, value):
+        ratio = min(max(value / 20, 0), 1)
+
+        status, bg, fg = get_status(value)
+
+        return card(
+            ft.Column(
+                controls=[
+                    ft.Stack(
+                        controls=[
+                            ft.ProgressRing(
+                                value=1,
+                                width=140,
+                                height=140,
+                                stroke_width=14,
+                                color=BORDER,
+                            ),
+
+                            ft.ProgressRing(
+                                value=ratio,
+                                width=140,
+                                height=140,
+                                stroke_width=14,
+                                color=TEAL,
+                            ),
+
+                            ft.Container(
+                                content=ft.Column(
+                                    controls=[
+                                        ft.Text(
+                                            f"{value:.1f}",
+                                            size=24,
+                                            weight=ft.FontWeight.W_600,
+                                            color=TEXT_MAIN,
+                                            text_align=ft.TextAlign.CENTER
+                                        ),
+
+                                        ft.Text(
+                                            "µg/m³",
+                                            size=11,
+                                            color=TEXT_MUTED,
+                                            text_align=ft.TextAlign.CENTER
+                                        ),
+                                    ],
+
+                                    alignment=ft.MainAxisAlignment.CENTER,
+                                    horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                                    spacing=2,
+                                ),
+
+                                alignment=ft.Alignment.CENTER,
+
+                                width=140,
+                                height=140
+                            )
+                        ],
+
+                        width=140,
+                        height=140
+                    ),
+
+                    ft.Text(
+                        label,
+                        size=12,
+                        color=TEXT_MUTED
+                    ),
+
+                    status_badge(
+                        status,
+                        bg,
+                        fg
+                    )
+                ],
+
+                horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                spacing=8
+            )
+        )
 
     return ft.Column(
-        controls=[result_card, metrics_card],
-        spacing=12,
-        expand=True,
+        controls=[
+            section_label(
+                "HASIL PREDIKSI",
+                ft.Icons.TRACK_CHANGES_ROUNDED
+            ),
+            ft.Row(
+                controls=[
+                    gauge_card(
+                        "CO",
+                        hasil_prediksi["co"]
+                    ),
+
+                    gauge_card(
+                        "NMHC",
+                        hasil_prediksi["nmhc"]
+                    ),
+
+                    gauge_card(
+                        "C6H6",
+                        hasil_prediksi["c6h6"]
+                    ),
+                ],
+
+                spacing=12,
+                wrap=True
+            ),
+
+            ft.Row(
+                controls=[
+                    gauge_card(
+                        "NOx",
+                        hasil_prediksi["nox"]
+                    ),
+
+                    gauge_card(
+                        "NO2",
+                        hasil_prediksi["no2"]
+                    ),
+                ],
+
+                spacing=12,
+                wrap=True
+            )
+        ],
+
+        spacing=16
     )
+
+    # metrics_card = card(
+    #     ft.Column(
+    #         controls=[
+    #             section_label("EVALUASI MODEL", ft.Icons.ANALYTICS_ROUNDED),
+    #             ft.Container(height=8),
+    #             ft.Row(
+    #                 controls=[
+    #                     metric_card("MAE", "0.82"),
+    #                     metric_card("RMSE", "1.14"),
+    #                     metric_card("R²", "0.91"),
+    #                 ],
+    #                 spacing=8,
+    #             ),
+    #             ft.Container(height=4),
+    #             ft.Text(
+    #                 "Algoritma: Linear Regression  ·  Dataset: UCI Air Quality 2004–2005",
+    #                 size=11, color=TEXT_MUTED,
+    #             ),
+    #         ],
+    #         spacing=8,
+    #     )
+    # )
+
+    # return ft.Column(
+    #     controls=[result_card, metrics_card],
+    #     spacing=12,
+    #     expand=True,
+    # )
 
 def build_trend_section():
     hourly = [5.2,4.8,4.5,4.3,4.6,5.8,8.2,11.4,12.8,11.6,
