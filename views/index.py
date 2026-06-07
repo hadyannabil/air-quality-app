@@ -43,8 +43,8 @@ def section_label(text, icon):
         spacing=4,
     )
 
-def make_field(label, hint, default):
-    """Buat TextField dengan label, hint range, dan nilai default."""
+def make_field(label, hint):
+    """Buat TextField dengan label dan hint range."""
     return ft.TextField(
         label=label,
         hint_text=hint,
@@ -119,22 +119,22 @@ def build_input_panel(page, on_predict):
     predictor = AirQualityPredictor()
 
     # Sensor PT08
-    tf_co   = make_field("PT08.S1 – Sensor CO",   "500–2500",  1360)
-    tf_nmhc = make_field("PT08.S2 – Sensor NMHC", "500–2500",  1046)
-    tf_nox  = make_field("PT08.S3 – Sensor NOx",  "500–2500",  1056)
-    tf_no2  = make_field("PT08.S4 – Sensor NO2",  "500–2500",  1692)
-    tf_o3   = make_field("PT08.S5 – Sensor O3",   "500–2500",  1268)
+    tf_co   = make_field("PT08.S1 – Sensor CO",   "600–2100")
+    tf_nmhc = make_field("PT08.S2 – Sensor NMHC", "350–2250")
+    tf_nox  = make_field("PT08.S3 – Sensor NOx",  "300–2700")
+    tf_no2  = make_field("PT08.S4 – Sensor NO2",  "500–2800")
+    tf_o3   = make_field("PT08.S5 – Sensor O3",   "200–2550")
 
     # Konsentrasi GT
-    tf_nmhc_gt = make_field("NMHC(GT) µg/m³",  "0–1400",  150)
-    tf_c6h6    = make_field("C6H6(GT) µg/m³",  "0–60",    11.9)
-    tf_nox_gt  = make_field("NOx(GT) ppb",      "0–1500",  166)
-    tf_no2_gt  = make_field("NO2(GT) µg/m³",   "0–340",   113)
+    tf_nmhc_gt = make_field("NMHC(GT) µg/m³",  "0–1400")
+    tf_c6h6    = make_field("C6H6(GT) µg/m³",  "0–60")
+    tf_nox_gt  = make_field("NOx(GT) ppb",      "0–1500")
+    tf_no2_gt  = make_field("NO2(GT) µg/m³",   "0–340")
 
     # Atmosfer
-    tf_temp = make_field("Temperatur °C",         "-5–45",   13.6)
-    tf_rh   = make_field("Kelembaban Relatif %",  "0–100",   48.9)
-    tf_ah   = make_field("Kelembaban Absolut",    "0.1–2.5", 0.7578)
+    tf_temp = make_field("Temperatur °C",         "-5–45")
+    tf_rh   = make_field("Kelembaban Relatif %",  "0–100")
+    tf_ah   = make_field("Kelembaban Absolut",    "0.1–2.5")
 
     # Error text
     err_text = ft.Text("", color="#EF4444", size=11)
@@ -301,12 +301,10 @@ def build_result_panel(co_val=None):
                 ft.Container(height=4),
                 ft.Row(controls=[status_badge(status_label, status_bg, status_fg)],
                        alignment=ft.MainAxisAlignment.CENTER),
-                ft.Container(height=12),
                 divider(),
                 section_label("INFO MODEL", ft.Icons.INFO_OUTLINE_ROUNDED),
                 ft.Container(height=4),
                 ft.Column(controls=info_items, spacing=6),
-                ft.Container(height=12),
                 divider(),
                 section_label("SKALA REFERENSI (WHO)", ft.Icons.HEALTH_AND_SAFETY_ROUNDED),
                 ft.Container(height=4),
@@ -334,7 +332,7 @@ def build_trend_section():
                         height=max(4, 100 * v / max_val),
                         bgcolor=color,
                         border_radius=ft.BorderRadius(top_left=3, top_right=3, bottom_left=0, bottom_right=0),
-                        tooltip=ft.Tooltip(message=f"{i:02d}:00 → {v} µg/m³"),
+                        tooltip=ft.Tooltip(message=f"{i:02d}:00 → {v} mg/m³"),
                     ),
                     ft.Text(
                         f"{i:02d}" if i % 6 == 0 else "",
@@ -416,11 +414,6 @@ def build_page(page: ft.Page):
                 main_row,
                 ft.Container(height=4),
                 build_trend_section(),
-                ft.Container(height=12),
-                ft.Text(
-                    "Kecerdasan Artifisial Lanjut  ·  Teknik Informatika  ·  Universitas Brawijaya",
-                    size=11, color=TEXT_MUTED, text_align=ft.TextAlign.CENTER,
-                ),
             ],
             spacing=12,
             expand=True,
