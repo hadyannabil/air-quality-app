@@ -1,13 +1,18 @@
 import joblib
 import numpy as np
 import os
+import sys
 
 class AirQualityPredictor:
 
     def __init__(self):
-        model_path = os.path.join(
-            os.path.dirname(__file__), "..", "models", "model.pkl"
-        )
+        if hasattr(sys, '_MEIPASS'):
+            model_path = os.path.join(sys._MEIPASS, "model.pkl")
+        else:
+            model_path = os.path.join(
+                os.path.dirname(__file__), "..", "models", "model.pkl"
+            )
+            
         self.model = joblib.load(model_path)
 
     def predict(
